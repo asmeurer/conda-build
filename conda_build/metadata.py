@@ -179,6 +179,7 @@ class MetaData(object):
         assert isdir(path)
         self.path = path
         self.meta_path = join(path, 'meta.yaml')
+        self.pyver = self.npyver = self.plver = None
         if not isfile(self.meta_path):
             self.meta_path = join(path, 'conda.yaml')
             if not isfile(self.meta_path):
@@ -261,9 +262,14 @@ class MetaData(object):
             check_bad_chrs(ret, 'build/string')
             return ret
         res = []
-        for name, s in (('numpy', 'np'), ('python', 'py'), ('perl', 'pl')):
+        for name, s, ver in (('numpy', 'np', self.npyver), ('python', 'py',
+            self.pyver), ('perl', 'pl', self.plver)):
             for ms in self.ms_depends():
                 if ms.name == name:
+                    if ver:
+                        v = ver
+                        res.append(s + v)
+                        break
                     v = ms.spec.split()[1]
                     if name != 'perl':
                         res.append(s + v[0] + v[2])

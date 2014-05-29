@@ -23,7 +23,7 @@ import conda.plan as plan
 from conda.api import get_index
 from conda.compat import PY3
 from conda.fetch import fetch_index
-from conda.install import prefix_placeholder
+from conda.install import prefix_placeholder, linked
 from conda.utils import url_path
 
 from conda_build import config, environ, source, tarcheck
@@ -235,6 +235,19 @@ def bldpkg_path(m):
     return join(config.bldpkgs_dir, '%s.tar.bz2' % m.dist())
 
 
+def set_vers(prefix, m):
+    import pudb;pudb.set_trace()
+    installed = linked(prefix)
+    for dist in installed:
+        name, ver, build = dist.rsplit('-', 2)
+        smallver = ver[0] + ver[2]
+        if name == 'python':
+            m.pyver = smallver
+        elif name == 'numpy':
+            m.npyver = smallver
+        elif name == 'perl':
+            m.plver = smallver
+
 def build(m, get_src=True, verbose=True, post=None):
     '''
     Build the package with the specified metadata.
@@ -253,6 +266,7 @@ def build(m, get_src=True, verbose=True, post=None):
         create_env(prefix, [ms.spec for ms in m.ms_depends('build')],
                    verbose=verbose)
 
+        set_vers(prefix, m)
         if get_src:
             source.provide(m.path, m.get_section('source'))
         assert isdir(source.WORK_DIR)
