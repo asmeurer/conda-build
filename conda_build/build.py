@@ -236,7 +236,6 @@ def bldpkg_path(m):
 
 
 def set_vers(prefix, m):
-    import pudb;pudb.set_trace()
     installed = linked(prefix)
     for dist in installed:
         name, ver, build = dist.rsplit('-', 2)
