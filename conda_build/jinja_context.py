@@ -11,8 +11,8 @@ import os
 from io import open
 
 from conda.compat import PY3
-from conda_build import environ
 from .environ import get_dict as get_environ
+from conda_build.config import config
 
 _setuptools_data = None
 
@@ -44,7 +44,9 @@ def load_npm():
         return json.load(pkg)
 
 def context_processor():
-    ctx = get_environ()
+    # XXX: This will be wrong if we have to use the long build prefix, but how
+    # can we know that at this point in the code?
+    ctx = get_environ(prefix=config.short_build_prefix)
     environ = dict(os.environ)
     environ.update(get_environ())
 

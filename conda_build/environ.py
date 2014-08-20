@@ -24,12 +24,14 @@ def get_perl_ver():
 def get_py_ver():
     return '.'.join(str(config.CONDA_PY))
 
-def get_stdlib_dir():
-    return join(config.build_prefix, 'Lib' if sys.platform == 'win32' else
+def get_stdlib_dir(prefix=None):
+    if not prefix:
+        prefix = config.build_prefix
+    return join(prefix, 'Lib' if sys.platform == 'win32' else
                                 'lib/python%s' % get_py_ver())
 
-def get_sp_dir():
-    return join(STDLIB_DIR, 'site-packages')
+def get_sp_dir(prefix=None):
+    return join(get_stdlib_dir(prefix=prefix), 'site-packages')
 
 def get_git_build_info(src_dir):
     # cd to the src_dir
@@ -56,15 +58,22 @@ def get_git_build_info(src_dir):
     os.chdir(cwd)
     return d
 
-# The UPPERCASE names are here for backwards compatibility. They will not
-# change correctly if conda_build.config.config.CONDA_PY changes. Use get_py_ver(),
-# etc. instead.
-PERL_VER = get_perl_ver()
-PY_VER = get_py_ver()
-STDLIB_DIR = get_stdlib_dir()
-SP_DIR = get_sp_dir()
+# # The UPPERCASE names are here for backwards compatibility. They will not
+# # change correctly if conda_build.config.config.CONDA_PY changes. Use get_py_ver(),
+# # etc. instead.
+# PERL_VER = get_perl_ver()
+# PY_VER = get_py_ver()
+# STDLIB_DIR = get_stdlib_dir()
+# SP_DIR = get_sp_dir()
 
-def get_dict(m=None, prefix=config.build_prefix):
+def get_dict(m=None, prefix=None):
+    if not prefix:
+        prefix = config.build_prefix
+
+    PERL_VER = get_perl_ver()
+    PY_VER = get_py_ver()
+    STDLIB_DIR = get_stdlib_dir(prefix=prefix)
+    SP_DIR = get_sp_dir(prefix=prefix)
 
     python = config.build_python
     d = {'CONDA_BUILD': '1'}
